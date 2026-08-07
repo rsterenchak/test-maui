@@ -1,6 +1,6 @@
 {
   "files": [
-    "src/MyApp.Core/Class1.cs",
+    "src/MyApp.Core/RentableItem.cs",
     "src/MyApp/App.xaml.cs",
     "src/MyApp/AppShell.xaml.cs",
     "src/MyApp/MainPage.xaml.cs",
@@ -18,11 +18,72 @@
   "hasDom": false,
   "types": [
     {
-      "name": "Class1",
+      "name": "RentableItem",
       "kind": "class",
-      "file": "src/MyApp.Core/Class1.cs",
-      "line": 3,
-      "members": []
+      "file": "src/MyApp.Core/RentableItem.cs",
+      "line": 16,
+      "members": [
+        {
+          "name": "RentableItem",
+          "kind": "method",
+          "signature": "RentableItem(string newItemId, string newName, decimal newDailyRate)",
+          "line": 27
+        },
+        {
+          "name": "getItemId",
+          "kind": "method",
+          "signature": "getItemId()",
+          "line": 38
+        },
+        {
+          "name": "getName",
+          "kind": "method",
+          "signature": "getName()",
+          "line": 44
+        },
+        {
+          "name": "getDailyRate",
+          "kind": "method",
+          "signature": "getDailyRate()",
+          "line": 50
+        },
+        {
+          "name": "getIsRented",
+          "kind": "method",
+          "signature": "getIsRented()",
+          "line": 56
+        },
+        {
+          "name": "setItemId",
+          "kind": "method",
+          "signature": "setItemId(string newItemId)",
+          "line": 64
+        },
+        {
+          "name": "setName",
+          "kind": "method",
+          "signature": "setName(string newName)",
+          "line": 70
+        },
+        {
+          "name": "setDailyRate",
+          "kind": "method",
+          "signature": "setDailyRate(decimal newDailyRate)",
+          "line": 76
+        },
+        {
+          "name": "setIsRented",
+          "kind": "method",
+          "signature": "setIsRented(bool newIsRented)",
+          "line": 82
+        },
+        {
+          "name": "ToString",
+          "kind": "method",
+          "signature": "ToString()",
+          "line": 90
+        }
+      ]
     },
     {
       "name": "App",
