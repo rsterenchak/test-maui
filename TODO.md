@@ -6,7 +6,7 @@
   - File: `src/MyApp.Core/RentableItem.cs`, `src/MyApp.Core/Class1.cs
   <!-- id: 71c98146-3f6f-4c11-95fa-e543e97e3079 -->
 
-- [ ] **[MEDIUM]** Add a Catalog type holding items with add, lookup, and list
+- [x] **[MEDIUM]** Add a Catalog type holding items with add, lookup, and list — Completed: 2026-08-07
   - Type: feature
   - Description: Create a `Catalog` class in MyApp.Core holding a collection of `RentableItem`, with methods to add an item, look one up by identifier, and list all items. A lookup for a missing identifier must return a not-found result (a nullable item or a `TryFind` bool pattern) and must not throw. Depends on `RentableItem` (A1). Follow `.claude/style.md` and the C# adaptation of `.claude/commenting-style.md`.
   - File: `src/MyApp.Core/Catalog.cs`, `src/MyApp.Core/RentableItem.cs
