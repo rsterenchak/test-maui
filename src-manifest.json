@@ -1,5 +1,6 @@
 {
   "files": [
+    "src/MyApp.Core/Catalog.cs",
     "src/MyApp.Core/RentableItem.cs",
     "src/MyApp/App.xaml.cs",
     "src/MyApp/AppShell.xaml.cs",
@@ -17,6 +18,38 @@
   "regions": [],
   "hasDom": false,
   "types": [
+    {
+      "name": "Catalog",
+      "kind": "class",
+      "file": "src/MyApp.Core/Catalog.cs",
+      "line": 16,
+      "members": [
+        {
+          "name": "Catalog",
+          "kind": "method",
+          "signature": "Catalog()",
+          "line": 24
+        },
+        {
+          "name": "findItem",
+          "kind": "method",
+          "signature": "findItem(string itemId)",
+          "line": 32
+        },
+        {
+          "name": "listItems",
+          "kind": "method",
+          "signature": "listItems()",
+          "line": 53
+        },
+        {
+          "name": "addItem",
+          "kind": "method",
+          "signature": "addItem(RentableItem newItem)",
+          "line": 61
+        }
+      ]
+    },
     {
       "name": "RentableItem",
       "kind": "class",
