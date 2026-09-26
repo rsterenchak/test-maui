@@ -4,35 +4,13 @@ This file is the agent's primary architectural reference for this repository. It
 
 ---
 
-## Onboarding checklist (delete this section after you finish)
-
-`onboard.sh` already did the mechanical part: every `{{…}}` placeholder in this
-file is filled, the workflows exist, the manifest variant is picked, and this repo
-is registered as an inject target. Two things it cannot do, because they need
-someone who knows the code:
-
-- [ ] Fill in **Key files in this repo** below — the load-bearing files under
-      `src/`, one line each. Without it every run greps blindly; with it
-      the run goes to the right file first.
-- [ ] Fill in the **conventions** a run must honor that the code does not make
-      obvious: where files live if not under `src/`, what must never be
-      introduced, how work is split. On coursework, put these in the Assignment
-      context section and include the assignment's own rules (a single
-      stylesheet, no frameworks, one entry per graded requirement, and so on).
-
-If any `{{…}}` remains anywhere in this file, `onboard.sh` missed it — fill it by
-hand. Then delete this section: the row Check in the PWA warns while it is still
-here, so a run never reads a stub thinking it is the reference.
-
----
-
 ## What this project is
 
 **Project name:** test-maui
 
-**Description:** (fill in a one-line description)
+**Description:** Scratch .NET MAUI repo for proving the maui shape end to end — CI build, tests, and the Appetize live preview — before real coursework.
 
-**Stack:** CommonJS
+**Stack:** C# / .NET MAUI (Android head), .NET 10
 
 **Source directory:** `src/`
 
@@ -99,14 +77,22 @@ The in-app Claude assistant's chat (Sonnet) gets context through three distinct 
 
 ## Key files in this repo
 
-> Fill this in with the actual load-bearing files. Aim for 1-line descriptions. Example structure:
->
-> - `src/main.js` (or equivalent entry point) — what it does
-> - `src/dataLayer.js` — data model / state — note if ALL mutations route through here
-> - `src/components/Foo.jsx` — what it does
-> - `tests/dataLayer.test.js` — test coverage for the data layer
->
-> Including this section honestly is high-leverage. Without it the agent has to grep blindly; with it the agent goes to the right file first.
+- `MyApp.sln` — solution at the repo root; CI builds and tests through it.
+- `src/MyApp.Core/` — plain `net10.0` class library. ALL testable logic (models, validation, data access) lives here, because the test project cannot reference the `-android` app project.
+- `src/MyApp/MyApp.csproj` — the MAUI app; CI builds only its `net10.0-android` target.
+- `src/MyApp/MauiProgram.cs` — app startup and service registration.
+- `src/MyApp/AppShell.xaml` — Shell navigation (routes and tabs).
+- `src/MyApp/MainPage.xaml` / `.xaml.cs` — the home page; code-behind stays thin and calls into `MyApp.Core`.
+- `src/MyApp/Resources/Styles/` — `Colors.xaml` and `Styles.xaml`, the app-wide styles.
+- `src/MyApp/Platforms/` — per-platform entry points; only `Android/` is built.
+- `tests/MyApp.Tests/` — xUnit tests against `MyApp.Core`.
+
+**Conventions**
+
+- Logic goes in `MyApp.Core`, UI goes in `MyApp`. CI cannot instantiate a page, so anything untested in the Core library is unverified.
+- Every new Core behavior ships with an xUnit test in `tests/MyApp.Tests/`.
+- Do not change the target frameworks or add iOS/Mac Catalyst/Windows work — only the Android head builds on the Linux runner.
+- No new NuGet packages unless the task names them.
 
 ---
 
