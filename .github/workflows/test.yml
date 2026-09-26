@@ -1,0 +1,196 @@
+name: Tests
+
+# ─────────────────────────────────────────────────────────────────
+# MAUI / .NET mobile variant of the test workflow.
+# Used for .NET MAUI projects (<UseMaui>true</UseMaui> or an -android target
+# framework). Builds the ANDROID head only — WGU's mobile course targets
+# Android, and the iOS / Mac Catalyst heads can't build on a Linux runner
+# anyway. No web deploy, no manifest publishing.
+#
+# Runs on ubuntu-latest: GitHub's ubuntu runners ship the Android SDK, and the
+# maui-android workload installs the rest. A MAUI project usually multi-targets
+# (net*-android;net*-ios;net*-windows), so the build is pinned to the Android
+# TFM — the windows/ios heads, which don't build on Linux, are never attempted.
+# (This is also why MAUI must be detected BEFORE the desktop shape: the
+# net*-windows entry in a MAUI multi-target would otherwise look like WinForms/WPF.)
+#
+# The onboard script fetches this as test.yml into the target repo and fills
+# . and 10.0.x.
+#
+# Behavior: builds the Android head (a compile failure fails CI). Runs
+# `dotnet test` ONLY on discovered test projects — scoped, so the app heads
+# aren't dragged into the test build — so a fresh assignment with no tests yet
+# still passes CI on the Android compile alone.
+#
+# Live preview (optional): on a push to main, the `appetize` job uploads the
+# Android APK to Appetize so the latest build can be run in a browser from any
+# phone. It skips cleanly (job stays green) until the APPETIZE_API_TOKEN secret
+# is set, so repos that don't use it see no change. See the job for setup.
+#
+# Watch-out on first run: `dotnet workload install` occasionally hits a
+# permissions error on a fresh runner image. If it does, the fix is to run that
+# one step with elevated permissions (see the commented sudo fallback below).
+# ─────────────────────────────────────────────────────────────────
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'TODO.md'
+  pull_request:
+    paths-ignore:
+      - 'TODO.md'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install MAUI Android workload
+        run: dotnet workload install maui-android
+        # If this step fails with a permissions error on a future runner image,
+        # swap the line above for: sudo dotnet workload install maui-android
+
+      - name: Build (Android head)
+        working-directory: .
+        shell: bash
+        run: |
+          # Find the MAUI app project (UseMaui or an -android TFM), then read the
+          # exact Android target-framework token so net8 vs net9 isn't hard-coded.
+          PROJ=$(find . -name '*.csproj' -print0 | xargs -0 grep -liE '<UseMaui>[[:space:]]*true|net[0-9]+\.[0-9]+-android' 2>/dev/null | head -1)
+          if [ -z "$PROJ" ]; then
+            echo "No MAUI project found (no <UseMaui> or -android TFM)."
+            echo "If this is a MAUI repo, check the shape; otherwise it was misrouted."
+            exit 1
+          fi
+          TFM=$(grep -hoiE 'net[0-9]+\.[0-9]+-android[0-9.]*' "$PROJ" | head -1)
+          if [ -z "$TFM" ]; then
+            echo "Could not determine the Android target framework from $PROJ."
+            echo "Add an explicit net*-android TFM, or adjust this workflow."
+            exit 1
+          fi
+          echo "Building $PROJ for $TFM"
+          dotnet build "$PROJ" -f "$TFM" -c Release
+
+      - name: Upload APK (best effort)
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: |
+            **/bin/Release/**/*.apk
+            **/bin/Release/**/*.aab
+          if-no-files-found: ignore
+
+      - name: Test (only if a test project exists)
+        working-directory: .
+        shell: bash
+        run: |
+          mapfile -t TEST_PROJS < <(find . -name '*.csproj' -print0 | xargs -0 grep -liE 'Microsoft.NET.Test.Sdk' 2>/dev/null)
+          if [ ${#TEST_PROJS[@]} -eq 0 ]; then
+            echo "No test project detected — Android build passed, skipping tests."
+          else
+            for tp in "${TEST_PROJS[@]}"; do
+              echo "Running dotnet test on $tp"
+              dotnet test "$tp" -c Release --verbosity normal
+            done
+          fi
+
+  # Uploads the APK the test job built to Appetize, replacing the previous build
+  # under the same publicKey so the app's link never changes. Runs only on a push
+  # to main (merged work), never on PRs, so it spends one upload per merge.
+  #
+  # Setup, once per repo:
+  #   1. Secret   APPETIZE_API_TOKEN   — from appetize.io > Account > API tokens.
+  #      onboard.sh sets it automatically when the template repo holds it.
+  #   2. Push to main. With no publicKey yet, this job CREATES the app and prints
+  #      its publicKey in the run summary.
+  #   3. Variable APPETIZE_PUBLIC_KEY  — save that publicKey as a repository
+  #      variable (Settings > Secrets and variables > Actions > Variables). Every
+  #      later push UPDATES that app instead of creating a new one.
+  # The app is created with run permission `authenticated`, so the link only
+  # works while signed in to the Appetize account.
+  appetize:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Check for Appetize token
+        id: gate
+        env:
+          APPETIZE_API_TOKEN: ${{ secrets.APPETIZE_API_TOKEN }}
+        run: |
+          if [ -z "$APPETIZE_API_TOKEN" ]; then
+            echo "APPETIZE_API_TOKEN not set — skipping live preview upload."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download APK
+        if: steps.gate.outputs.enabled == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk
+          path: apk
+
+      - name: Upload to Appetize
+        if: steps.gate.outputs.enabled == 'true'
+        env:
+          APPETIZE_API_TOKEN: ${{ secrets.APPETIZE_API_TOKEN }}
+          APPETIZE_PUBLIC_KEY: ${{ vars.APPETIZE_PUBLIC_KEY }}
+        run: |
+          # A Release build emits both an .aab and a universal *-Signed.apk;
+          # Appetize runs the signed APK only.
+          APK=$(find apk -name '*-Signed.apk' | head -1)
+          if [ -z "$APK" ]; then
+            echo "No *-Signed.apk in the android-apk artifact. Files found:"
+            find apk -type f
+            exit 1
+          fi
+          echo "Uploading $APK ($(du -h "$APK" | cut -f1))"
+
+          if [ -n "$APPETIZE_PUBLIC_KEY" ]; then
+            ENDPOINT="https://api.appetize.io/v1/apps/$APPETIZE_PUBLIC_KEY"
+          else
+            ENDPOINT="https://api.appetize.io/v1/apps"
+          fi
+
+          RESP=$(curl -sS --fail-with-body --max-time 600 -X POST "$ENDPOINT" \
+            -H "X-API-KEY: $APPETIZE_API_TOKEN" \
+            -F "file=@$APK" \
+            -F "platform=android" \
+            -F "appPermissions.run=authenticated" \
+            -F "note=${GITHUB_SHA::7}") || { echo "Appetize upload failed: $RESP"; exit 1; }
+
+          KEY=$(printf '%s' "$RESP" | jq -r '.publicKey // empty')
+          if [ -z "$KEY" ]; then
+            echo "Appetize response had no publicKey: $RESP"
+            exit 1
+          fi
+          LINK="https://appetize.io/app/$KEY"
+          {
+            echo "### Live preview"
+            echo "[$LINK]($LINK) — build ${GITHUB_SHA::7}"
+            if [ -z "$APPETIZE_PUBLIC_KEY" ]; then
+              echo ""
+              echo "New app created. Save \`$KEY\` as the repository variable"
+              echo "\`APPETIZE_PUBLIC_KEY\` so later pushes update this app instead"
+              echo "of creating another."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "Live preview: $LINK"
