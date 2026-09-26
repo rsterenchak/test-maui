@@ -1,0 +1,200 @@
+{
+  "files": [
+    "src/MyApp.Core/Class1.cs",
+    "src/MyApp/App.xaml.cs",
+    "src/MyApp/AppShell.xaml.cs",
+    "src/MyApp/MainPage.xaml.cs",
+    "src/MyApp/MauiProgram.cs",
+    "src/MyApp/Platforms/Android/MainActivity.cs",
+    "src/MyApp/Platforms/Android/MainApplication.cs",
+    "src/MyApp/Platforms/MacCatalyst/AppDelegate.cs",
+    "src/MyApp/Platforms/MacCatalyst/Program.cs",
+    "src/MyApp/Platforms/Windows/App.xaml.cs",
+    "src/MyApp/Platforms/iOS/AppDelegate.cs",
+    "src/MyApp/Platforms/iOS/Program.cs"
+  ],
+  "srcRoot": "",
+  "regions": [],
+  "hasDom": false,
+  "types": [
+    {
+      "name": "Class1",
+      "kind": "class",
+      "file": "src/MyApp.Core/Class1.cs",
+      "line": 3,
+      "members": []
+    },
+    {
+      "name": "App",
+      "kind": "class",
+      "file": "src/MyApp/App.xaml.cs",
+      "line": 5,
+      "members": [
+        {
+          "name": "App",
+          "kind": "method",
+          "signature": "App()",
+          "line": 7
+        },
+        {
+          "name": "CreateWindow",
+          "kind": "method",
+          "signature": "CreateWindow(IActivationState? activationState)",
+          "line": 12
+        }
+      ]
+    },
+    {
+      "name": "AppShell",
+      "kind": "class",
+      "file": "src/MyApp/AppShell.xaml.cs",
+      "line": 3,
+      "members": [
+        {
+          "name": "AppShell",
+          "kind": "method",
+          "signature": "AppShell()",
+          "line": 5
+        }
+      ]
+    },
+    {
+      "name": "MainPage",
+      "kind": "class",
+      "file": "src/MyApp/MainPage.xaml.cs",
+      "line": 3,
+      "members": [
+        {
+          "name": "MainPage",
+          "kind": "method",
+          "signature": "MainPage()",
+          "line": 7
+        },
+        {
+          "name": "OnCounterClicked",
+          "kind": "method",
+          "signature": "OnCounterClicked(object? sender, EventArgs e)",
+          "line": 12
+        }
+      ]
+    },
+    {
+      "name": "MauiProgram",
+      "kind": "class",
+      "file": "src/MyApp/MauiProgram.cs",
+      "line": 5,
+      "members": [
+        {
+          "name": "CreateMauiApp",
+          "kind": "method",
+          "signature": "CreateMauiApp()",
+          "line": 7
+        }
+      ]
+    },
+    {
+      "name": "MainActivity",
+      "kind": "class",
+      "file": "src/MyApp/Platforms/Android/MainActivity.cs",
+      "line": 8,
+      "members": []
+    },
+    {
+      "name": "MainApplication",
+      "kind": "class",
+      "file": "src/MyApp/Platforms/Android/MainApplication.cs",
+      "line": 7,
+      "members": [
+        {
+          "name": "MainApplication",
+          "kind": "method",
+          "signature": "MainApplication(IntPtr handle, JniHandleOwnership ownership)",
+          "line": 9
+        },
+        {
+          "name": "CreateMauiApp",
+          "kind": "method",
+          "signature": "CreateMauiApp()",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "name": "AppDelegate",
+      "kind": "class",
+      "file": "src/MyApp/Platforms/MacCatalyst/AppDelegate.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "CreateMauiApp",
+          "kind": "method",
+          "signature": "CreateMauiApp()",
+          "line": 8
+        }
+      ]
+    },
+    {
+      "name": "Program",
+      "kind": "class",
+      "file": "src/MyApp/Platforms/MacCatalyst/Program.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "Main",
+          "kind": "method",
+          "signature": "Main(string[] args)",
+          "line": 9
+        }
+      ]
+    },
+    {
+      "name": "App",
+      "kind": "class",
+      "file": "src/MyApp/Platforms/Windows/App.xaml.cs",
+      "line": 11,
+      "members": [
+        {
+          "name": "App",
+          "kind": "method",
+          "signature": "App()",
+          "line": 17
+        },
+        {
+          "name": "CreateMauiApp",
+          "kind": "method",
+          "signature": "CreateMauiApp()",
+          "line": 22
+        }
+      ]
+    },
+    {
+      "name": "AppDelegate",
+      "kind": "class",
+      "file": "src/MyApp/Platforms/iOS/AppDelegate.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "CreateMauiApp",
+          "kind": "method",
+          "signature": "CreateMauiApp()",
+          "line": 8
+        }
+      ]
+    },
+    {
+      "name": "Program",
+      "kind": "class",
+      "file": "src/MyApp/Platforms/iOS/Program.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "Main",
+          "kind": "method",
+          "signature": "Main(string[] args)",
+          "line": 9
+        }
+      ]
+    }
+  ],
+  "lens": "types"
+}
